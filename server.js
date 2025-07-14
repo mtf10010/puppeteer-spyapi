@@ -7,7 +7,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.post('/profile', async (req, res) => {
+app.post('/api/profile', async (req, res) => {
+
   const { username } = req.body;
   if (!username) return res.status(400).json({ error: "username é obrigatório" });
 
