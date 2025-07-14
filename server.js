@@ -42,10 +42,10 @@ app.post('/api/profile', async (req, res) => {
     await browser.close();
 
     res.status(200).json(data);
-  } catch (err) {
-    console.error('Erro no Puppeteer:', err.message);
-    res.status(500).json({ success: false, error: 'Erro ao buscar dados com spoof' });
-  }
+} catch (err) {
+  console.error('Erro no Puppeteer:', err); // mostra erro completo
+  res.status(500).json({ success: false, error: 'Erro ao buscar dados com spoof' });
+}
 });
 
 const PORT = process.env.PORT || 3000;
