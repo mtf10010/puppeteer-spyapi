@@ -1,33 +1,39 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 const cors = require('cors');
-const fetch = require('node-fetch');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 app.post('/api/profile', async (req, res) => {
+  const fetch = (await import('node-fetch')).default;
+
   const { username } = req.body;
-  if (!username) return res.status(400).json({ error: "username é obrigatório" });
+  if (!username) {
+    return res.status(400).json({ error: "username é obrigatório" });
+  }
 
   try {
+    // Obter IP do usuário
     const ipRes = await fetch("https://api.ipify.org?format=json");
     const { ip } = await ipRes.json();
 
+    // Registrar IP no backend da spyapp
     await fetch("https://spyapp.website/api/userIp.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ip, user: username, method: "profile" })
     });
 
+    // Lançar navegador (spoof de ambiente)
     const browser = await puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
 
-    // Requisição à API spyapp e log do conteúdo da resposta
+    // Requisição para API real
     const response = await fetch("https://spyapp.website/api/n8n/getProfileData.php", {
       method: "POST",
       headers: {
@@ -57,3 +63,4 @@ app.post('/api/profile', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('🚀 API rodando na porta', PORT));
+
